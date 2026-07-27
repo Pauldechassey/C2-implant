@@ -4,7 +4,6 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from app.database.database import engine
-from app.auth import init as auth_init, check_token
 from app.ws_manager import log_manager, command_manager
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)s | %(levelname)s | %(message)s")
@@ -15,11 +14,8 @@ logger = logging.getLogger("team-server")
 async def lifespan(app: FastAPI):
     from app.database.database import Base
     Base.metadata.create_all(bind=engine)
-    auth_init()
     print("\n\033[92m" + "=" * 44)
     print("   TEAM SERVER")
-    print("=" * 44)
-    print("   login : root / root")
     print("=" * 44 + "\033[0m\n")
     yield
 
@@ -39,7 +35,7 @@ app.add_middleware(
 )
 
 
-SILENT_ROUTES = {("GET", "/commands/")}
+SILENT_ROUTES = {("GET", "/commands/"), ("GET", "/agent/status")}
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
@@ -55,10 +51,7 @@ async def log_requests(request: Request, call_next):
 
 
 @app.websocket("/ws/logs")
-async def ws_logs(ws: WebSocket, token: str = ""):
-    if not check_token(token):
-        await ws.close(code=1008)
-        return
+async def ws_logs(ws: WebSocket):
     await log_manager.connect(ws)
     try:
         while True:
@@ -68,10 +61,7 @@ async def ws_logs(ws: WebSocket, token: str = ""):
 
 
 @app.websocket("/ws/commands")
-async def ws_commands(ws: WebSocket, token: str = ""):
-    if not check_token(token):
-        await ws.close(code=1008)
-        return
+async def ws_commands(ws: WebSocket):
     await command_manager.connect(ws)
     try:
         while True:
@@ -86,7 +76,7 @@ def read_root():
 
 
 from app.routes.command_routes import router as command_router
-from app.routes.auth_routes import router as auth_router
+from app.routes.agent_routes import router as agent_router
 
 app.include_router(command_router, tags=["commands"])
-app.include_router(auth_router)
+app.include_router(agent_router)

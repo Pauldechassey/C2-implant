@@ -242,7 +242,7 @@ Or from your local machine if port-forwarded:
 http://localhost:5173
 ```
 
-Login with the password exposed in the api logs (`docker logs team-server`).
+No login required, the dashboard is open directly.
 
 Note : This implant is reallyyyyyyy simple and part of my personnal learning process (final year internship project). Enjoy ;)
 

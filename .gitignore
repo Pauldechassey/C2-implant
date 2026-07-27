@@ -34,6 +34,9 @@ share/python-wheels/
 target/
 Cargo.lock
 
+# Node
+node_modules/
+
 # IDE
 .vscode/
 .idea/

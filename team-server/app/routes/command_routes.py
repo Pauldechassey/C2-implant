@@ -5,6 +5,7 @@ from ..services.command_service import CommandService
 from ..database.database import get_db
 from ..enums.command_status import CommandStatus
 from ..ws_manager import command_manager
+from .. import agent_status
 
 router = APIRouter(prefix="/commands")
 
@@ -15,6 +16,7 @@ def list_commands(db: Session = Depends(get_db)):
 
 @router.get("/next", response_model=CommandRead)
 def get_next_command(db: Session = Depends(get_db)):
+    agent_status.touch()
     command = CommandService.get_next(db)
     if not command:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="No pending command")

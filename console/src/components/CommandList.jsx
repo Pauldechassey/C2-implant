@@ -1,6 +1,7 @@
 import { useState } from 'react'
+import AgentStatus from './AgentStatus'
 
-export default function CommandList({ commands, selectedId, onSelect, onDelete }) {
+export default function CommandList({ commands, selectedId, onSelect, onDelete, lastSeen }) {
   const [openId, setOpenId] = useState(null)
 
   function toggleMenu(e, id) {
@@ -11,24 +12,30 @@ export default function CommandList({ commands, selectedId, onSelect, onDelete }
   function handleDelete(e, id) {
     e.stopPropagation()
     setOpenId(null)
-    onDelete(id)
+    if (window.confirm('Supprimer cette commande ?')) {
+      onDelete(id)
+    }
   }
 
   return (
     <div className="command-list">
-      <div className="panel-header">COMMANDS</div>
+      <div className="panel-header panel-header-row">
+        <span>COMMANDS</span>
+        <AgentStatus lastSeen={lastSeen} />
+      </div>
       <table className="cmd-table">
         <thead>
           <tr>
             <th>#</th>
             <th>COMMAND</th>
             <th>STATUS</th>
+            <th>TIME</th>
             <th></th>
           </tr>
         </thead>
         <tbody>
           {commands.length === 0 && (
-            <tr><td colSpan={4} className="empty">no commands</td></tr>
+            <tr><td colSpan={5} className="empty">no commands</td></tr>
           )}
           {commands.map(cmd => (
             <tr
@@ -39,8 +46,9 @@ export default function CommandList({ commands, selectedId, onSelect, onDelete }
               <td className="dim">{cmd.order}</td>
               <td className="cmd-text">{cmd.command}</td>
               <td><StatusBadge status={cmd.status} /></td>
+              <td className="dim">{formatTime(cmd.updated_at)}</td>
               <td className="cmd-menu-cell">
-                <button className="menu-dots" onClick={e => toggleMenu(e, cmd.id)}>⋮</button>
+                <button className="menu-dots" onClick={e => toggleMenu(e, cmd.id)}>⋯</button>
                 {openId === cmd.id && (
                   <button className="menu-delete" onClick={e => handleDelete(e, cmd.id)}>
                     supprimer
@@ -53,6 +61,11 @@ export default function CommandList({ commands, selectedId, onSelect, onDelete }
       </table>
     </div>
   )
+}
+
+function formatTime(iso) {
+  if (!iso) return ''
+  return new Date(iso).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' })
 }
 
 function StatusBadge({ status }) {

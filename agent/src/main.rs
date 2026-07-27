@@ -20,7 +20,7 @@ async fn main() {
 
     loop {
         if let Some(cmd) = http::get_command(&client, base_url).await {
-            let output = executor::execute(&cmd.command);
+            let output = executor::execute(&cmd.command).await;
 
             http::send_response(&client, base_url, cmd.id, &CommandResponse {
                 status: "DONE".to_string(),

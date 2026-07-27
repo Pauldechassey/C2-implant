@@ -1,8 +1,18 @@
 use std::process::Command as Cmd;
+use tokio::time::{timeout, Duration};
 
-pub fn execute(cmd: &str) -> String {
-    match Cmd::new("sh").arg("-c").arg(cmd).output() {
-        Ok(out) => String::from_utf8_lossy(&out.stdout).to_string(),
-        Err(e)  => format!("error: {e}"),
+const COMMAND_TIMEOUT_SECS: u64 = 30;
+
+pub async fn execute(cmd: &str) -> String {
+    let fut = async {
+        match Cmd::new("sh").arg("-c").arg(cmd).output() {
+            Ok(out) => String::from_utf8_lossy(&out.stdout).to_string(),
+            Err(e) => format!("error: {e}"),
+        }
+    };
+
+    match timeout(Duration::from_secs(COMMAND_TIMEOUT_SECS), fut).await {
+        Ok(result) => result,
+        Err(_) => format!("error: command timeout after {}s", COMMAND_TIMEOUT_SECS),
     }
 }
