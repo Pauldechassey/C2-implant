@@ -9,11 +9,10 @@ use models::CommandResponse;
 
 #[tokio::main]
 async fn main() {
-    let base_url = option_env!("BASE_URL").unwrap_or("https://localhost");
+    let base_url = option_env!("BASE_URL").unwrap_or("http://localhost:8000");
     let jitter_min: u64 = option_env!("JITTER_MIN").and_then(|v| v.parse().ok()).unwrap_or(3);
     let jitter_max: u64 = option_env!("JITTER_MAX").and_then(|v| v.parse().ok()).unwrap_or(7);
     let client = Client::builder()
-        .danger_accept_invalid_certs(true) //this is for testing purposes only, in production you should use valid certificates (using a domain name and a CA-signed certificate)
         .build()
         .unwrap();
 
