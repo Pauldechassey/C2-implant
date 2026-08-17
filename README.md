@@ -6,40 +6,39 @@ This repository contains C2 (Command & Control) implant code for security resear
 
 Remote code execution agent written in Rust for authorized security testing.
 
-## Overview
-
-This implant is designed to:
-- Execute commands remotely via the C2 server
-- Bypass proxy configurations (this branch)
-- Handle HTTP communication with the team server
-- Maintain connection reliability with configurable timeouts
-
-## Branches
-
-- **implant-simple**: Basic implant with direct HTTP communication
-- **bypass-proxy**: Enhanced implant with proxy bypass capabilities (you are here)
-
 ## Building
+
+### Linux to Windows (MinGW)
+
+```bash
+rustup target add x86_64-pc-windows-gnu
+cargo build --target x86_64-pc-windows-gnu --release
+# Output: target/x86_64-pc-windows-gnu/release/agent.exe
+```
+
+### Linux to Linux
 
 ```bash
 cargo build --release
+# Output: target/release/agent
+```
+
+### With Environment Variables
+
+```bash
+BASE_URL=http://10.10.10.10:8000 cargo build --target x86_64-pc-windows-gnu --release
 ```
 
 ## Configuration
 
-Edit `.env` file:
+Pass as environment variables during build:
 ```
-SERVER_URL=http://your-c2-server:port
-POLL_INTERVAL=5000
-PROXY_BYPASS=true
+BASE_URL=http://your-c2-server:port
+JITTER_MIN=3
+JITTER_MAX=7
 ```
 
-## Components
-
-- `src/main.rs` - Entry point and main loop
-- `src/executor.rs` - Command execution engine
-- `src/http.rs` - C2 communication protocol with proxy bypass
-- `src/models.rs` - Data structures
+Defaults: localhost:8000, jitter 3-7 seconds
 
 ## Security Notice
 
