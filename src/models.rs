@@ -1,14 +1,13 @@
 use serde::{Deserialize, Serialize};
+use uuid::Uuid;
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Command {
-    pub id: i32,
-    pub command: String,
-    pub status: String,
+    pub id: Uuid,
+    pub text: String,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Debug, Serialize, Deserialize)]
 pub struct CommandResponse {
     pub output: String,
-    pub status: String,
 }

@@ -1,0 +1,52 @@
+{
+  "client": {
+    "api_url": "http://localhost:8000",
+    "jitter_min": 3,
+    "jitter_max": 7,
+    "next_command_route": "/commands/next",
+    "command_response_route": "/commands/",
+    "headers": {
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+      "Accept": "text/html,application/xhtml+xml",
+      "Accept-Encoding": "gzip, deflate"
+    },
+    "serializer": "hex",
+    "chunk_size": 8,
+    "fragments": [
+      {"index": 0, "location": "body", "field": "frag_0"},
+      {"index": 1, "location": "body", "field": "frag_1"}
+    ],
+    "garbages": [
+      {"location": "body", "field": "stream_metadata", "garbage_type": "json_data"},
+      {"location": "header", "field": "X-Stream-Type", "garbage_type": "stream_header"},
+      {"location": "header", "field": "X-Timestamp", "garbage_type": "timestamp"}
+    ],
+    "command_id": {
+      "location": "body",
+      "field": "csrf_token"
+    }
+  },
+
+  "server": {
+    "headers": {
+      "Server": "Apache/2.4.41",
+      "Content-Type": "application/javascript; charset=utf-8",
+      "Cache-Control": "max-age=3600"
+    },
+    "serializer": "base64",
+    "chunk_size": 4,
+    "fragments": [
+      {"index": 0, "location": "body", "field": "data_0"},
+      {"index": 1, "location": "body", "field": "data_1"}
+    ],
+    "garbages": [
+      {"location": "body", "field": "metadata", "garbage_type": "json_data"},
+      {"location": "header", "field": "X-Response-Type", "garbage_type": "stream_header"},
+      {"location": "header", "field": "X-Response-Time", "garbage_type": "timestamp"}
+    ],
+    "command_id": {
+      "location": "body",
+      "field": "csrf_token"
+    }
+  }
+}
