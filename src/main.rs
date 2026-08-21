@@ -23,11 +23,11 @@ async fn main() {
     };
 
     // Récupérer les paramètres du profile
-    let api_url = profiles.api_url.as_deref().unwrap_or("http://localhost:8000");
+    let api_url = profiles.api_url.as_deref().unwrap_or("");
     let jitter_min = profiles.jitter_min.unwrap_or(3);
     let jitter_max = profiles.jitter_max.unwrap_or(7);
-    let next_route = profiles.next_command_route.as_deref().unwrap_or("/commands/next");
-    let response_route = profiles.command_response_route.as_deref().unwrap_or("/commands/");
+    let next_route = profiles.next_command_route.as_deref().unwrap_or("");
+    let response_route = profiles.command_response_route.as_deref().unwrap_or("");
 
     let client = Client::builder().build().unwrap();
 
