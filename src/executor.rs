@@ -3,25 +3,29 @@ use tokio::time::{timeout, Duration};
 
 const COMMAND_TIMEOUT_SECS: u64 = 30;
 
-pub async fn execute(cmd: &str) -> String {
+pub async fn execute(cmd: &str, shell: &str) -> String {
     let trimmed = cmd.trim();
 
-    // Validate sudo usage
-    if trimmed.starts_with("sudo ") {
-        let has_n_flag = trimmed.contains(" -n ");
-        let has_s_flag = trimmed.contains(" -S ");
-        let has_echo_pipe = trimmed.contains("echo") && trimmed.contains("|");
+    // Validate based on shell type
+    if is_unix_shell(shell) {
+        if trimmed.starts_with("sudo ") {
+            let has_n_flag = trimmed.contains(" -n ");
+            let has_s_flag = trimmed.contains(" -S ");
+            let has_echo_pipe = trimmed.contains("echo") && trimmed.contains("|");
 
-        if !has_n_flag && !(has_s_flag && has_echo_pipe) {
-            return "error: sudo only allowed with '-n' or '-S' (via 'echo password | sudo -S ...')".to_string();
+            if !has_n_flag && !(has_s_flag && has_echo_pipe) {
+                return "error: sudo only allowed with '-n' or '-S' (via 'echo password | sudo -S ...')".to_string();
+            }
         }
     }
 
     let fut = async {
-        match Cmd::new("sh")
-            .arg("-c")
+        let (shell_cmd, shell_arg) = get_shell_command(shell);
+
+        match Cmd::new(shell_cmd)
+            .arg(shell_arg)
             .arg(cmd)
-            .stdin(Stdio::null())  // Block stdin to prevent unexpected password prompts
+            .stdin(Stdio::null())
             .output()
         {
             Ok(out) => {
@@ -30,14 +34,12 @@ pub async fn execute(cmd: &str) -> String {
                 let status = out.status.code().unwrap_or(-1);
 
                 if out.status.success() {
-                    // Return stdout if success, or stderr if stdout is empty
                     if stdout.is_empty() && !stderr.is_empty() {
                         stderr
                     } else {
                         stdout
                     }
                 } else {
-                    // Return stderr for errors
                     let output = if stderr.is_empty() {
                         stdout
                     } else {
@@ -53,5 +55,17 @@ pub async fn execute(cmd: &str) -> String {
     match timeout(Duration::from_secs(COMMAND_TIMEOUT_SECS), fut).await {
         Ok(result) => result,
         Err(_) => format!("error: command timeout after {}s", COMMAND_TIMEOUT_SECS),
+    }
+}
+
+fn is_unix_shell(shell: &str) -> bool {
+    matches!(shell.to_lowercase().as_str(), "sh" | "bash" | "zsh" | "ksh")
+}
+
+fn get_shell_command(shell: &str) -> (&str, &str) {
+    match shell.to_lowercase().as_str() {
+        "powershell" | "pwsh" => ("powershell", "-Command"),
+        "cmd" => ("cmd", "/c"),
+        _ => ("sh", "-c"),
     }
 }

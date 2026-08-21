@@ -32,6 +32,7 @@ pub struct ProfileConfig {
     pub fragments: Vec<Fragment>,
     pub garbages: Option<Vec<Garbage>>,
     pub command_id: Option<CommandId>,
+    pub shell: Option<String>,
 }
 
 #[derive(Debug, Clone, Deserialize, Serialize)]
@@ -220,5 +221,9 @@ impl Profiles {
             next_command_route: root.client.next_command_route,
             command_response_route: root.client.command_response_route,
         })
+    }
+
+    pub fn get_shell(&self) -> &str {
+        self.client.config.shell.as_deref().unwrap_or("sh")
     }
 }
